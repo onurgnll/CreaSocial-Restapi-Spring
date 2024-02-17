@@ -54,8 +54,9 @@ public class SecurityConfig {
             }
         };
     }
+
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -63,7 +64,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(x ->
                 x.requestMatchers("/auth/**").permitAll()
-                  .anyRequest().authenticated()
+                        .requestMatchers("/file/**").permitAll()
+                        .anyRequest().authenticated()
+
 
         );
 
@@ -80,7 +83,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userService);
         daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
