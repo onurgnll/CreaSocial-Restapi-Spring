@@ -24,16 +24,20 @@ public class User implements UserDetails {
 
     private String surname;
 
+    @JsonIgnore
     private String password;
 
 
+    @JsonIgnore
     @OneToOne(mappedBy = "user")
     private PersonalStatements personalStatements;
 
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Friendship> userFriends;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Post> posts;
 
