@@ -1,5 +1,6 @@
 package com.app.facebookclone.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,14 +16,17 @@ public class FriendshipRequest {
     @Column(name = "friendship_request_id")
     private Long friendshipRequestId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "sender_id")
     private User sender;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
+    @JsonIgnore
     @Column(nullable = false)
     private boolean accepted;
 

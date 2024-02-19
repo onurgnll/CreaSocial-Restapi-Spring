@@ -1,5 +1,6 @@
 package com.app.facebookclone.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class PersonalStatements {
 
     private String coverImage;
 
-
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;

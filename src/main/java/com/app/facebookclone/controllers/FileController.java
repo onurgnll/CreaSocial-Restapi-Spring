@@ -1,6 +1,7 @@
 package com.app.facebookclone.controllers;
 
 import com.app.facebookclone.services.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,11 @@ public class FileController {
 
 
     @PostMapping("/post")
-    public ResponseEntity uploadPostFile(@RequestParam("file") MultipartFile[] file, @RequestParam int userId) {
+    public ResponseEntity uploadPostFile(@RequestParam("file") MultipartFile[] file, @RequestParam int postId) {
         try {
 
             for (int i  = 0 ; i < file.length ; i ++){
-                fileService.savePostImage(file[i], userId , String.valueOf(i) + ".png");
+                fileService.savePostImage(file[i], postId , String.valueOf(i) + ".png");
 
             }
 
@@ -34,10 +35,10 @@ public class FileController {
         }
     }
 
-    @GetMapping("/post/{postId}")
+    @GetMapping("/post/{postId}/{imageId}")
     @ResponseBody
-    public ResponseEntity<Resource> getPostImage(@PathVariable int postId) {
-        Resource file = fileService.getProfileImage(userId);
+    public ResponseEntity<Resource> getPostImage(@PathVariable int postId, @PathVariable int imageId) {
+        Resource file = fileService.getPostImage(postId , imageId);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
@@ -55,17 +56,17 @@ public class FileController {
     }
 
 
-    @GetMapping("/cover/{userId}")
+    @GetMapping("/cover/{filename}")
     @ResponseBody
-    public ResponseEntity<Resource> getCoverFile(@PathVariable int userId) {
-        Resource file = fileService.getCoverImage(userId);
+    public ResponseEntity<Resource> getCoverFile(@PathVariable String filename) {
+        Resource file = fileService.getCoverImage(filename);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
 
     @PostMapping("/profile")
-    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, @RequestParam String userId) {
+    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int userId) {
         try {
             fileService.saveProfileImage(file, userId);
 
@@ -76,10 +77,10 @@ public class FileController {
     }
 
 
-    @GetMapping("/profile/{userId}")
+    @GetMapping("/profile/{filename}")
     @ResponseBody
-    public ResponseEntity<Resource> getFile(@PathVariable int userId) {
-        Resource file = fileService.getProfileImage(userId);
+    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+        Resource file = fileService.getProfileImage(filename);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }

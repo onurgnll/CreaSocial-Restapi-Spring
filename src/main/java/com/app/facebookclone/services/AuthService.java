@@ -1,6 +1,7 @@
 package com.app.facebookclone.services;
 
 import com.app.facebookclone.entities.PersonalStatements;
+import com.app.facebookclone.entities.Role;
 import com.app.facebookclone.entities.User;
 import com.app.facebookclone.exceptions.AlreadyExistException;
 import com.app.facebookclone.exceptions.NotFoundException;
@@ -8,6 +9,7 @@ import com.app.facebookclone.exceptions.WrongInputException;
 import com.app.facebookclone.repos.RoleRepo;
 import com.app.facebookclone.requests.LoginRequest;
 import com.app.facebookclone.requests.RegisterRequest;
+import com.app.facebookclone.requests.VerifyAccountReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 @Service
 public class AuthService {
@@ -26,6 +29,13 @@ public class AuthService {
     private JwtService jwtService;
 
     private RoleRepo roleRepo;
+
+    private EmailService emailService;
+
+    @Autowired
+    public void setEmailService(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     private AuthenticationManager authenticationManager;
     private PersonalStatementsService personalStatementsService;
@@ -55,6 +65,18 @@ public class AuthService {
     }
 
 
+    private String generateVerificationCode(){
+        String characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder randomString = new StringBuilder();
+
+        for (int i = 0; i < 8; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            randomString.append(characters.charAt(randomIndex));
+        }
+
+        return randomString.toString();
+    }
 
     public HashMap<String, Object> registerUser(RegisterRequest registerRequest) {
 
@@ -66,6 +88,9 @@ public class AuthService {
 
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         User user = new User();
+
+        user.setVerificationCode(generateVerificationCode());
+
 
         user.setEmail(registerRequest.getEmail());
         user.setName(registerRequest.getName());
@@ -79,11 +104,16 @@ public class AuthService {
 
         User savedUser = userService.save(user);
 
+        emailService.sendSimpleMessage(registerRequest.getEmail(),"Kayıt Olundu" , "Email Doğrulama Kodun: " + user.getVerificationCode());
+
+
         hashMap.put("user", savedUser);
 
         PersonalStatements personalStatements = new PersonalStatements();
 
         personalStatements.setUser(savedUser);
+        personalStatements.setCoverImage("http://localhost:3000/api/file/cover/default.png");
+        personalStatements.setProfileImage("http://localhost:3000/api/file/profile/default.png");
 
         personalStatementsService.save(personalStatements);
 
@@ -129,6 +159,27 @@ public class AuthService {
     }
 
 
+    public User verifyAccount(VerifyAccountReq verifyAccountReq, Long userId) {
 
 
+        User user = userService.findUserById(userId);
+
+        if(user == null){
+            throw  new NotFoundException("Not found user");
+        }
+
+
+        if(user.getVerificationCode().equals(verifyAccountReq.getVerificationCode())){
+            Role role = roleRepo.findByName("ROLE_VERIFIED");
+
+            user.getAuthorities().add(role);
+
+            return userService.save(user);
+
+        }else{
+            throw new WrongInputException("Yanlış Kod");
+        }
+
+
+    }
 }

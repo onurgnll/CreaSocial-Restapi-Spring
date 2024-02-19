@@ -27,8 +27,10 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-
     @JsonIgnore
+    private String verificationCode;
+
+
     @OneToOne(mappedBy = "user")
     private PersonalStatements personalStatements;
 
@@ -36,6 +38,10 @@ public class User implements UserDetails {
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Friendship> userFriends;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "receiver")
+    private List<FriendshipRequest> friendRequests;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")

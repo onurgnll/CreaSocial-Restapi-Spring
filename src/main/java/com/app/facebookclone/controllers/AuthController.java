@@ -2,6 +2,7 @@ package com.app.facebookclone.controllers;
 
 import com.app.facebookclone.requests.LoginRequest;
 import com.app.facebookclone.requests.RegisterRequest;
+import com.app.facebookclone.requests.VerifyAccountReq;
 import com.app.facebookclone.response.ResponseHandler;
 import com.app.facebookclone.services.AuthService;
 import com.app.facebookclone.services.UserService;
@@ -29,5 +30,9 @@ public class AuthController {
         return ResponseHandler.generateResponse(200, authService.login(loginRequest));
     }
 
+    @PostMapping("/verifyaccount/{userId}")
+    public ResponseEntity<Object> verifyAccount(@RequestBody VerifyAccountReq verifyAccountReq , @PathVariable Long userId){
+        return ResponseHandler.generateResponse(200, authService.verifyAccount(verifyAccountReq ,userId));
+    }
 
 }

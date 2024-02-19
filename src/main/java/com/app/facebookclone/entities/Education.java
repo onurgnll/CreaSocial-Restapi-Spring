@@ -1,5 +1,6 @@
 package com.app.facebookclone.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class Education {
 
     private Boolean isGraduated;
 
+    @JsonIgnore
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE , CascadeType.PERSIST , CascadeType.REFRESH})
     @JoinColumn(name = "personal_statements_id")
     private PersonalStatements personalStatements;

@@ -65,7 +65,7 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(x ->
                 x.requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/file/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("USER") //VERIFIED
 
 
         );
